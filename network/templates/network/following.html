@@ -1,0 +1,21 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    <h2>Following Feed</h2>
+
+    <div id="following-posts">
+        {% for post in posts %}
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'profile' user_id=post.user.id %}"><strong>{{ post.user.username }}</strong></a>
+                    </h5>
+                    <p class="card-text">{{ post.content }}</p>
+                    <p class="card-text"><small class="text-muted">{{ post.timestamp }}</small></p>
+                </div>
+            </div>
+        {% empty %}
+            <p>You are not following anyone yet, or they haven't posted anything!</p>
+        {% endfor %}
+    </div>
+{% endblock %}

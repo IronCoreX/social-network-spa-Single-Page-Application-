@@ -1,0 +1,68 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    <h2>All Posts</h2>
+
+    {% if user.is_authenticated and posts.number == 1 %}
+        <div class="card mb-4 border-primary">
+            <div class="card-body">
+                <h5>New Post</h5>
+                <form action="{% url 'index' %}" method="post">
+                     {% csrf_token %}
+                    <textarea name="content" class="form-control mb-2" rows="3" placeholder="What's on your mind?"></textarea>
+                    <button type="submit" class="btn btn-primary">Post</button>
+                </form>
+            </div>
+        </div>
+    {% endif %}
+
+    <div id="all-posts">
+        {% for post in posts %}
+            <div class="card mb-2 border-secondary">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'profile' user_id=post.user.id %}"><strong>{{ post.user.username }}</strong></a>
+                    </h5>
+                    
+                    <div id="content-{{ post.id }}" class="card-text">{{ post.content }}</div>
+                    
+                    <p class="card-text mt-2"><small class="text-muted">{{ post.timestamp }}</small></p>
+
+                    <p class="card-text">
+                        <button class="btn btn-sm" onclick="toggle_like('{{ post.id }}')" id="like-btn-{{ post.id }}">
+                            {% if user in post.likes.all %}
+                                ❤️
+                            {% else %}
+                                🤍
+                            {% endif %}
+                        </button>
+                        <span id="like-count-{{ post.id }}" class="text-muted">{{ post.likes.count }}</span>
+                    </p>
+
+                    {% if user.is_authenticated and user == post.user %}
+                        <button class="btn btn-outline-primary btn-sm" onclick="edit_post('{{ post.id }}')">Edit</button>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if posts.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ posts.previous_page_number }}">Previous</a></li>
+            {% endif %}
+
+            <li class="page-item disabled">
+                <span class="page-link">Page {{ posts.number }} of {{ posts.paginator.num_pages }}</span>
+            </li>
+
+            {% if posts.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ posts.next_page_number }}">Next</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ posts.paginator.num_pages }}">Last &raquo;</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+{% endblock %}
